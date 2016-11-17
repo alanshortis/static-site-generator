@@ -1,0 +1,36 @@
+{
+  "name": "staticsitegenerator",
+  "author": "Alan Shortis",
+  "version": "1.0.0",
+  "description": "A static site generator, for quick prototyping",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "start": "gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alanshortis/static-site-generator"
+  },
+  "engines" : {
+    "node": ">=4.5"
+  },
+  "devDependencies": {
+    "browserify": "^13.1.0",
+    "del": "^2.2.1",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.0",
+    "gulp-connect": "^5.0.0",
+    "gulp-handlebars-html": "0.0.2",
+    "gulp-imagemin": "^3.0.3",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^2.3.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "handlebars": "^4.0.5",
+    "js-cookie": "^2.1.2",
+    "node-notifier": "^4.6.0",
+    "screenfull": "^3.0.2",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0"
+  }
+}

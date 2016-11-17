@@ -1,0 +1,19 @@
+html {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  @extend html;
+  overflow: auto;
+  background: $color-background;
+  color: $color-type;
+  font-size: $base-font-size;
+  line-height: $base-line-height;
+  background-color: $white;
+}
+
+::selection {
+  background: $color-background;
+  color: $color-type;
+}

@@ -1,0 +1,6 @@
+// These helpers are last in the style sheet as they must be respected.
+// In this scenario, using !important is totally acceptable.
+
+.visually-hidden {
+  display: none !important;
+}
