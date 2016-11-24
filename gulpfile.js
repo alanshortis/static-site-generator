@@ -91,7 +91,7 @@ gulp.task('images', () => {
 
 // Build handlebars templates.
 gulp.task('html', () => {
-  
+
   // If you need to pass data to the view, put it in this object.
   const templateData = {
     name: 'Del Trotter',
@@ -103,7 +103,7 @@ gulp.task('html', () => {
     allowedExtensions: ['hbs', 'html', 'svg']
   };
 
-  return gulp.src(`${paths.src.html}/**/*{hbs, html}`)
+  return gulp.src([`${paths.src.html}/**/*{hbs, html}`, `!${paths.src.html}/partials/**/*{hbs, html}`])
     .pipe(gulpHandlebars(templateData, options))
     .pipe(rename((path) => {
       path.extname = '.html';
