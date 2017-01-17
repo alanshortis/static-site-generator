@@ -1,8 +1,10 @@
 const gulp = require('gulp'),
       sass = require('gulp-sass'),
+      sassLint = require('gulp-sass-lint'),
       sourcemaps = require('gulp-sourcemaps'),
       autoprefixer = require('gulp-autoprefixer'),
       browserify = require('browserify'),
+      eslint = require('gulp-eslint'),
       handlebars = require('handlebars'),
       gulpHandlebars = require('gulp-handlebars-html')(handlebars),
       notifier = require('node-notifier'),
@@ -47,7 +49,7 @@ gulp.task('serve', ['clean', 'css', 'js', 'images', 'html'], () => {
 });
 
 
-gulp.task('css', () => {
+gulp.task('css', ['sasslint'], () => {
   return gulp.src(paths.src.sass)
     .pipe(sourcemaps.init())
     .pipe(sass({outputStyle: 'expanded'})
@@ -67,7 +69,21 @@ gulp.task('css', () => {
 });
 
 
-gulp.task('js', () => {
+gulp.task('sasslint', () => {
+  return gulp.src(paths.src.sass)
+    .pipe(sassLint())
+    .pipe(sassLint.format())
+    .pipe(sassLint.failOnError())
+    .on('error', () => {
+      notifier.notify({
+        title: 'Gulp',
+        message: 'SASS liniting failed'
+      });
+    });
+});
+
+
+gulp.task('js', ['eslint'], () => {
   return browserify({entries: `${paths.src.js}/app.js`, extensions: ['.js'], debug: true})
     .bundle()
     .pipe(source('app.js'))
@@ -75,6 +91,20 @@ gulp.task('js', () => {
     .pipe(sourcemaps.write())
     .pipe(gulp.dest(paths.dest.js))
     .pipe(browserSync.stream());
+});
+
+
+gulp.task('eslint', () => {
+  return gulp.src(['gulpfile.js', `${paths.src.js}/*.js`])
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError())
+    .on('error', () => {
+      notifier.notify({
+        title: 'Gulp',
+        message: 'JS liniting failed'
+      });
+    });
 });
 
 
