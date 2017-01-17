@@ -7,7 +7,9 @@ This is a small boilerplate for creating static sites for prototypes/proof of co
 
 ## What this isn't
 
-In its current form, this solution isn't suitable for production ready sites. There is no minification or linting of CSS/JavaScript and there has been no performance testing of building a large set of partials and data into a static site.
+In its current form, this solution isn't suitable for production ready sites. There is no minification of CSS/JavaScript and there has been no performance testing of building a large set of partials and data into a static site.
+
+[Jekyll](https://jekyllrb.com/) is a nice static site generator if you're looking for something better.
 
 
 ## Dependancies
@@ -20,9 +22,7 @@ In its current form, this solution isn't suitable for production ready sites. Th
 ## Getting started
 
 * `yarn install` to get development dependencies.
-* `npm start` or `gulp` to build the site, start a server and watch for changes.
-* Go to [localhost:3000](http://localhost:3000) to view/debug.
-* Changes to the source will automatically refresh in the browser.
+* `npm start` or `gulp` to build the site, start a server with Browsersync, launch at [localhost:3000](http://localhost:3000) and watch for changes.
 
 
 ## Features
@@ -41,5 +41,5 @@ All example source files are commented.
 ## Deployment
 
 * Only the content of the `dist` folder needs to be deployed to a server or shared.
-* This solution only uses a server for debugging to enable development features.
+* This solution only uses a server for debugging and to enable development features.
 * Features that require a server to work (Cookies, AJAX) will not work as expected when served as a static site.
