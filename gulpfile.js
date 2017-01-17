@@ -1,31 +1,27 @@
-'use strict';
-
 const gulp = require('gulp'),
+      sass = require('gulp-sass'),
+      sourcemaps = require('gulp-sourcemaps'),
       autoprefixer = require('gulp-autoprefixer'),
       browserify = require('browserify'),
-      buffer = require('vinyl-buffer'),
-      connect = require('gulp-connect'),
-      del = require('del'),
       handlebars = require('handlebars'),
       gulpHandlebars = require('gulp-handlebars-html')(handlebars),
-      imagemin = require('gulp-imagemin'),
       notifier = require('node-notifier'),
       rename = require('gulp-rename'),
-      sass = require('gulp-sass'),
+      del = require('del'),
+      buffer = require('vinyl-buffer'),
       source = require('vinyl-source-stream'),
-      sourcemaps = require('gulp-sourcemaps');
+      browserSync = require('browser-sync').create();
 
-
-// File paths.
 const paths = {
   src: {
     html: 'src/views',
-    sass: 'src/sass',
+    partials: 'src/views/partials',
+    sass: 'src/sass/**/*.scss',
     js: 'src/js',
     img: 'src/img'
   },
-  dist : {
-    dist: './dist',
+  dest : {
+    dest: './dist',
     html: 'dist',
     css: 'dist/css',
     js: 'dist/js',
@@ -35,98 +31,84 @@ const paths = {
 };
 
 
-// Start a server.
-gulp.task('connect', () => {
-  connect.server({
-    port: 3000,
-    root: paths.dist.dist,
-    livereload: true,
-    fallback: `${paths.dist.dist}/404.html`
+gulp.task('serve', ['clean', 'css', 'js', 'images', 'html'], () => {
+  browserSync.init({
+    server: {
+      baseDir: paths.dest.dest,
+      serveStaticOptions: {
+        extensions: ['html']
+      }
+    }
   });
+  gulp.watch(paths.src.sass, ['css']);
+  gulp.watch(`${paths.src.js}/**/*.js`, ['js']);
+  gulp.watch(`${paths.src.img}/**/*`, ['images']);
+  gulp.watch(`${paths.src.html}/**/*`, ['html']);
 });
 
 
-// Build CSS from SASS with sourcemaps and autoprefix.
 gulp.task('css', () => {
-  return gulp.src(`${paths.src.sass}/**/*.scss`)
+  return gulp.src(paths.src.sass)
     .pipe(sourcemaps.init())
-    .pipe(sass({outputStyle: 'expanded', precision: 3})
-    .on('error', (err) => {
+    .pipe(sass({outputStyle: 'expanded'})
+    .on('error', function(err) {
       sass.logError.call(this, err);
       notifier.notify({
         title: 'Gulp',
-        message: 'SASS error - see terminal for details.'
+        message: 'SASS error'
       });
     }))
     .pipe(autoprefixer({
       browsers: ['last 2 versions']
     }))
-    .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest(paths.dist.css))
-    .pipe(connect.reload());
+    .pipe(sourcemaps.write())
+    .pipe(gulp.dest(paths.dest.css))
+    .pipe(browserSync.stream());
 });
 
 
-// Build our JS modules.
 gulp.task('js', () => {
   return browserify({entries: `${paths.src.js}/app.js`, extensions: ['.js'], debug: true})
     .bundle()
     .pipe(source('app.js'))
     .pipe(buffer())
-    .pipe(sourcemaps.init({loadMaps: true}))
-    .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest(`${paths.dist.js}`))
-    .pipe(connect.reload());
+    .pipe(sourcemaps.write())
+    .pipe(gulp.dest(paths.dest.js))
+    .pipe(browserSync.stream());
 });
 
 
-// Optimise images and put them in the dist folder.
 gulp.task('images', () => {
   return gulp.src(`${paths.src.img}/**/*`)
-    .pipe(imagemin())
-    .pipe(gulp.dest(`${paths.dist.img}`))
-    .pipe(connect.reload());
+    .pipe(gulp.dest(`${paths.dest.img}`))
+    .pipe(browserSync.stream());
 });
 
 
-// Build handlebars templates.
 gulp.task('html', () => {
-
-  // If you need to pass data to the view, put it in this object.
   const templateData = {
     name: 'Del Trotter',
     company: 'Trotters Independent Traders'
   };
 
   const options = {
-    partialsDirectory: [`${paths.src.html}/partials`],
-    allowedExtensions: ['hbs', 'html', 'svg']
+    partialsDirectory: paths.src.partials,
+    allowedExtensions: ['hbs', 'html']
   };
 
-  return gulp.src([`${paths.src.html}/**/*{hbs, html}`, `!${paths.src.html}/partials/**/*{hbs, html}`])
+  return gulp.src([`${paths.src.html}/**/*{hbs, html}`, `!${paths.src.partials}/**/*{hbs, html}`])
     .pipe(gulpHandlebars(templateData, options))
     .pipe(rename((path) => {
       path.extname = '.html';
     }))
-    .pipe(gulp.dest(paths.dist.dist))
-    .pipe(connect.reload());
+    .pipe(gulp.dest(paths.dest.dest))
+    .pipe(browserSync.stream());
 });
 
 
-// Delete all generated files.
 gulp.task('clean', () => {
-  return del.sync([paths.dist.dist, `${paths.dist.partials}/icons.svg`]);
+  return del.sync(paths.dest.dest);
 });
 
 
-// Watch for changes.
-gulp.task('watch', () => {
-  gulp.watch(`${paths.src.html}/**/*.hbs`, ['html']);
-  gulp.watch(`${paths.src.sass}/**/*.scss`, ['css']);
-  gulp.watch(`${paths.src.js}/**/*.js`, ['js']);
-  gulp.watch(`${paths.src.img}/**/*`, ['images']);
-});
-
-
-// Run it all.
-gulp.task('default', ['clean', 'html', 'images', 'js', 'css', 'connect', 'watch']);
+gulp.task('default', ['serve']);
